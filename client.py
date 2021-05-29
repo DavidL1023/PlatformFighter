@@ -129,7 +129,7 @@ class Player():
     def move(self, userInput):
         self.dy = 0
         # Jump
-        if userInput[pygame.K_w] and not self.jumped and self.invincibility_timer == 0:
+        if (userInput[pygame.K_w] or userInput[pygame.K_SPACE]) and not self.jumped and self.invincibility_timer == 0:
             jump_fx.play()
             self.vel_y = -19 #Jump height
             self.jumped = True
