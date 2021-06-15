@@ -14,11 +14,10 @@ pygame.mouse.set_cursor(pygame.cursors.broken_x)
 
 # Variables
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+screen_movement = -50 #Moves screen around where player is
 clock = pygame.time.Clock() #For getting fps
 main_menu = True
 game_over = False
-prev_time = time.time() # Ensure Game Consistency If Lag
-dt = 0
 
 # Load and Size Images
 right = [None]*6 #Sprite frames
@@ -36,22 +35,22 @@ restart_img = pygame.transform.scale(pygame.image.load('menu/restart_button.png'
 start_img = pygame.transform.scale(pygame.image.load('menu/start_button.png'), (130, 80))
 exit_img = pygame.transform.scale(pygame.image.load('menu/exit_button.png'), (130, 80))
 title_img = pygame.image.load('menu/title.png')
-background_img = pygame.transform.scale(pygame.image.load('map/map1.jpg'), (SCREEN_WIDTH, SCREEN_HEIGHT))
+background_img = pygame.transform.scale(pygame.image.load('map/map1.jpg'), (SCREEN_WIDTH+100, SCREEN_HEIGHT+100))
 bullet_img = pygame.transform.scale(pygame.image.load('specialfx/bullet.png'), (30, 22))
 
 # Load and Equalize Sounds
 shoot_fx = pygame.mixer.Sound('specialfx/shoot_sound.wav')
-shoot_fx.set_volume(VOLUME - 0.16)
+shoot_fx.set_volume(VOLUME/3)
 death_fx = pygame.mixer.Sound('specialfx/death_sound.wav')
-death_fx.set_volume(VOLUME - 0.1)
+death_fx.set_volume(VOLUME)
 #walk_fx = 
 damage_fx = pygame.mixer.Sound('specialfx/damage_sound.wav')
-damage_fx.set_volume(VOLUME)
+damage_fx.set_volume(VOLUME/0.6)
 #sword_fx = 
 jump_fx = pygame.mixer.Sound('specialfx/jump_sound.wav')
-jump_fx.set_volume(VOLUME - 0.1)
+jump_fx.set_volume(VOLUME/0.8)
 menu_fx = pygame.mixer.Sound('specialfx/click_sound.wav')
-menu_fx.set_volume(VOLUME + 0.1)
+menu_fx.set_volume(VOLUME/0.8)
 
 # Draw Text Function
 font_fps = pygame.font.SysFont('Arial', 18)
@@ -117,8 +116,7 @@ class Button():
                 menu_fx.play()
                 self.clicked = True
                 time.sleep(0.2) #Fixes bug where you attack after pressing button
-            if pygame.mouse.get_pressed()[0] == False:
-                self.clicked = False
+
         # Draw Button
         screen.blit(self.image, self.rect)
 
@@ -131,7 +129,7 @@ class Player():
         # Jump
         if (userInput[pygame.K_w] or userInput[pygame.K_SPACE]) and not self.jumped and self.invincibility_timer == 0:
             jump_fx.play()
-            self.vel_y = -19 #Jump height
+            self.vel_y = -20 #Jump height
             self.jumped = True
         # Gravity
         self.vel_y += 1.1 #Fall speed
@@ -143,14 +141,14 @@ class Player():
             self.dx += 1 #Walk acceleration
             if self.dx >= 8: #Max walk speed
                 self.dx = 8
-            self.face_right = True
-            self.face_left = False
+            self.going_right = True
+            self.going_left = False
         elif userInput[pygame.K_a] and not self.jumped and self.invincibility_timer == 0:
             self.dx -= 1
             if self.dx <= -8:
                 self.dx = -8
-            self.face_right = False
-            self.face_left = True
+            self.going_right = False
+            self.going_left = True
         # Keep Aerial Momentum
         elif self.stored_direction and self.jumped and self.dx != 0: 
             self.dx = 13 #Aerial speed
@@ -162,8 +160,8 @@ class Player():
                 self.dx -= 1
             elif self.dx < 0:
                 self.dx += 1
-            self.face_right = False
-            self.face_left = False     
+            self.going_right = False
+            self.going_left = False     
         # Collision in y Direction
         for tile in world.tile_list: 
             if tile[1].colliderect(self.hitbox.x, self.hitbox.y + self.dy, self.hitbox.width, self.hitbox.height):
@@ -177,6 +175,8 @@ class Player():
         # Collision in x Direction
             if tile[1].colliderect(self.hitbox.x + self.dx, self.hitbox.y, self.hitbox.width, self.hitbox.height):
                 self.dx = 0
+                self.going_left = False
+                self.going_right = False
         # Update Movement (must be here)
         self.x += self.dx
         self.y += self.dy
@@ -189,15 +189,15 @@ class Player():
         #Sprite Animation
         if self.stepIndex >= 60: #This step index is a multiple of the amount of frames in the sprite to slow the sprite
             self.stepIndex = 0
-        if self.face_right:
+        if self.going_right:
             screen.blit(right[self.stepIndex//10], (self.x, self.y)) #stepIndex divided by this number must be equal to the amount of frames the animation has
             self.stored_direction = True
             self.stepIndex += 1
-        if self.face_left:
+        if self.going_left:
             screen.blit(left[self.stepIndex//10], (self.x, self.y))
             self.stored_direction = False
             self.stepIndex += 1
-        if not self.face_left and not self.face_right:
+        if not self.going_left and not self.going_right:
             if self.stepIndex >= 56:
                 self.stepIndex = 0
             if self.stored_direction == True:
@@ -257,8 +257,8 @@ class Player():
         self.y = y
         self.dx = 0
         self.stored_direction = True #True = was facing right, False = was facing left
-        self.face_right = False
-        self.face_left = False
+        self.going_right = False
+        self.going_left = False
         self.stepIndex = 0
         # Jump
         self.vel_y = 0
@@ -339,8 +339,8 @@ class Dummy():
         self.y = y
         self.vel_x = 5 #Dummy walk speed
         self.stored_direction = False #True = was facing right, False = was facing left
-        self.face_right = True
-        self.face_left = False
+        self.going_right = True
+        self.going_left = False
         self.stepIndex = 0
         # AI stuff
         self.prev_x = x #For tracker method
@@ -351,7 +351,6 @@ class Dummy():
         self.hitbox = pygame.Rect(self.x, self.y, 64, 64)
         self.hit = False #If hit true
         self.hitpoints = 3 #Amount of health
-        self.hit_direction = 0 #Keeps track of which side dummy was hit for knockback purpose, 0 = hit from left, 1 = hit from right
         
     def draw(self, screen):
         # Hitbox
@@ -362,15 +361,15 @@ class Dummy():
         self.tracker()
         if self.stepIndex >= 60: #This step index is a multiple of the amount of frames in the sequence to slow the frames
             self.stepIndex = 0
-        if self.face_left:
+        if self.going_left:
             screen.blit(left[self.stepIndex//10], (self.x, self.y))
             self.stored_direction = False
             self.stepIndex += 1
-        if self.face_right:
+        if self.going_right:
             screen.blit(right[self.stepIndex//10], (self.x, self.y))
             self.stored_direction = True
             self.stepIndex += 1
-        if not self.face_left and not self.face_right:
+        if not self.going_left and not self.going_right:
             if self.stepIndex >= 56:
                 self.stepIndex = 0
             if self.stored_direction == True:
@@ -384,14 +383,14 @@ class Dummy():
         self.dx = self.x - self.prev_x
         self.prev_x = self.x
         if self.dx > 0:
-            self.face_right = True
-            self.face_left = False
+            self.going_right = True
+            self.going_left = False
         elif self.dx < 0:
-            self.face_left = True
-            self.face_right = False
+            self.going_left = True
+            self.going_right = False
         else:
-            self.face_right = False
-            self.face_left = False
+            self.going_right = False
+            self.going_left = False
 
     def hit_reg(self):
         # Attack
@@ -437,7 +436,7 @@ def player_attributes():
 dummies = []
 def dummy_attributes():
     if len(dummies) == 0: 
-        dummy1 = Dummy(random.randint(200,1600), 600)
+        dummy1 = Dummy(random.randint(800,1400), 600)
         dummies.append(dummy1)
     for dummy in dummies:
         dummy.move()
@@ -447,7 +446,12 @@ def dummy_attributes():
 
 # Draw Game
 def draw_game():
-    screen.blit(background_img, (0, 0))
+    global screen_movement
+    if(player.dx > 0):
+        screen_movement += 0.2
+    elif(player.dx < 0):
+        screen_movement -= 0.2
+    screen.blit(background_img, (screen_movement, 0))
     # Draw instances
     world.draw()
     player.draw(screen)
@@ -470,7 +474,6 @@ def draw_game():
 # Mainloop
 run = True
 while run:
-
     # Quit Game
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -483,19 +486,18 @@ while run:
         start_button.draw()
         exit_button.draw()
         if start_button.clicked == True:
+            start_button.clicked = False
             main_menu = False
         if exit_button.clicked == True:
             run = False
     else:
-        # Frame consistency with movement
-        curr_time = time.time()
-        dt = curr_time - prev_time #Multiply or add this to variables affiliated with frames
-        prev_time = curr_time
-
         # Input Update
         userInput = pygame.key.get_pressed()
 
         # Call Methods, Restart Game
+        if userInput[pygame.K_ESCAPE]:
+            main_menu = True
+            player.reset(600, 600)
         if restart_button.clicked == True:
             restart_button.clicked = False
             game_over = False
