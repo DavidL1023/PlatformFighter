@@ -1,13 +1,8 @@
-# My first serious programming project
+# Platform Fighter
+Is a little game for me to get used to some object oriented programming in Python. It's my first serious/personal programming project.
 
-Is a platform fighter for me to get used to some object oriented programming in Python
+## How To Use
+Once you have the repository, just run the client with Python interpreter. WASD to move, left click to shoot, ESC to bring back the main menu. There's also some stuff you can mess around with in the settings file, including a tilemap for changing the map.
 
-## Whoah test
+### Whoah test
   - Whoah
-
-My plans for the game
-  - was too ambitious got bored, instead just:
-
-  - convert to exe for players
-
-  - leave pvp for multiplayer

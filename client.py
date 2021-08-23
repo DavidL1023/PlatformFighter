@@ -1,6 +1,5 @@
 import pygame, math, time, random
 from pygame import mixer
-from network import Network
 from settings import *
 
 
@@ -71,14 +70,22 @@ class World():
     def __init__(self, data):
         self.tile_list = []
         # Load Map Images
-        floor_img = pygame.image.load('map/floor.png')
+        wall_img = pygame.image.load('map/wall.png')
+        platform_img = pygame.image.load('map/platform.jpg')
         # Append Images/Rectangles to tile_list
         row_count = 0
         for row in data:
             col_count = 0
             for tile in row: #Here, each number after == represents a specific block type to be put on the map
                 if tile == 1:
-                    img = pygame.transform.scale(floor_img, (TILE_SIZE, TILE_SIZE))
+                    img = pygame.transform.scale(wall_img, (TILE_SIZE, TILE_SIZE))
+                    img_rect = img.get_rect()
+                    img_rect.x = col_count * TILE_SIZE
+                    img_rect.y = row_count * TILE_SIZE
+                    tile = (img, img_rect) #Tile[0] is sprite image, tile[1] is physical rectangle on grid
+                    self.tile_list.append(tile)
+                if tile == 2:
+                    img = pygame.transform.scale(platform_img, (TILE_SIZE, TILE_SIZE))
                     img_rect = img.get_rect()
                     img_rect.x = col_count * TILE_SIZE
                     img_rect.y = row_count * TILE_SIZE
@@ -115,7 +122,7 @@ class Button():
             if pygame.mouse.get_pressed()[0] and self.clicked == False:
                 menu_fx.play()
                 self.clicked = True
-                time.sleep(0.2) #Fixes bug where you attack after pressing button
+                time.sleep(0.2) #Fixes bug where you attack after clicking screen button
 
         # Draw Button
         screen.blit(self.image, self.rect)
@@ -332,7 +339,7 @@ class Bullet:
         # Bullet
         screen.blit(bullet_img_rotated, (self.x, self.y))
 
-class Dummy():
+class Dummy(): #This dummy is really just a placeholder for another player, but I'm limited to what I can easily do with pygame.
     def __init__(self, x, y):
         # Walk
         self.x = x
@@ -359,10 +366,10 @@ class Dummy():
             pygame.draw.rect(screen, (0,0,0), self.hitbox, 1)
         # Sprite Animation
         self.tracker()
-        if self.stepIndex >= 60: #This step index is a multiple of the amount of frames in the sequence to slow the frames
+        if self.stepIndex >= 60: #This step index is a multiple of the amount of frames in the sprite to slow the sprite
             self.stepIndex = 0
         if self.going_left:
-            screen.blit(left[self.stepIndex//10], (self.x, self.y))
+            screen.blit(left[self.stepIndex//10], (self.x, self.y)) #stepIndex divided by this number must be equal to the amount of frames the animation has
             self.stored_direction = False
             self.stepIndex += 1
         if self.going_right:
