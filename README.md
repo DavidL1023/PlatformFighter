@@ -1,7 +1,7 @@
 # Platform Fighter
 Is a little game for me to get used to some object oriented programming in Python. It's my first serious/personal programming project.
 
-## Libraries Used
+## Dependencies
 ### [pygame](https://github.com/pygame/)
 
 ## How To Use
