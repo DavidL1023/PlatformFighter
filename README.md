@@ -1,5 +1,5 @@
 # Platform Fighter
-Is a little game for me to get used to some object oriented programming in Python. It's my first serious/personal programming project.
+Is a little game for me to get used to some object oriented programming in Python. It's my first serious/personal programming project. What I learned is that starting projects like this is hard, working on it once you're used to it is pretty fun, but then trying to finish it can be torture. For example, I wanted to add LAN functionality but there isn't much online about pygame and adding multiple clients, so it became torture and I just ended the project without it. Maybe I'll add AI functionality in the future?
 
 # Dependencies
 ### / [pygame](https://github.com/pygame/) /
