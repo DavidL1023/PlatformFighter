@@ -1,4 +1,4 @@
-import pygame, math, time, random
+import pygame, math, time, random, ctypes
 from pygame import mixer
 from settings import *
 
@@ -10,6 +10,7 @@ pygame.init()
 pygame.display.set_caption(WINDOW_TITLE)
 pygame.display.set_icon(pygame.image.load('menu/yoshi.png'))
 pygame.mouse.set_cursor(pygame.cursors.broken_x)
+ctypes.windll.user32.SetProcessDPIAware() #Fix windows scaling
 
 # Variables
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
