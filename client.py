@@ -540,9 +540,9 @@ def enemy_attributes():
 # Draw Game
 def draw_game():
     global screen_movement
-    if(player.dx > 0):
+    if(player.dx > 0 and not game_over):
         screen_movement += 0.2
-    elif(player.dx < 0):
+    elif(player.dx < 0 and not game_over):
         screen_movement -= 0.2
     screen.blit(background_img, (screen_movement, 0))
     # Draw instances
@@ -601,6 +601,7 @@ while run:
             player.reset(600, 600)
             enemy.reset(1200, 600)
             enemy.death_count = 0
+            screen_movement = -50 #Fix bug where screen parallax doesnt reset
         if game_over == False: #Only if alive
             player_attributes()
             enemy_attributes()
