@@ -214,7 +214,7 @@ class Player():
                 screen.blit(stationaryL[self.stepIndex//14], (self.x, self.y))
             self.stepIndex += 1
 
-    def hit_reg(self): #I have this set up such that attacking gives calculated data to victim, and being attacked takes data calculated from attacker
+    def hit_reg(self): #I have this set up such that attacking gives calculated data to victim, and being attacked takes data calculated from attacker (yes, I know this could be better)
         # Hurt
         if self.hit:
             if self.hitpoints > 1:
@@ -338,9 +338,9 @@ class Bullet:
         # Bullet
         screen.blit(bullet_img_rotated, (self.x, self.y))
 
-class Enemy(): #Just copies player class but with bot stuff
+class Enemy(Player): #Inherits player, overrides some methods
     def __init__(self, x, y):
-        self.reset(x, y)
+        super().__init__(x, y)
         self.death_count = 0
         self.direction = 1 #1 means walks right, -1 means walks left (for random movement ai)
     
@@ -427,31 +427,7 @@ class Enemy(): #Just copies player class but with bot stuff
         self.x += self.dx
         self.y += self.dy
 
-    def draw(self, screen):
-        # Hitbox
-        self.hitbox = pygame.Rect(self.x + 60, self.y + 30, 40, 80) # Constants: xpos and ypos of hitbox, width and height of hitbox
-        if SHOW_HITBOX:
-            pygame.draw.rect(screen, (0,0,0), self.hitbox, 1)
-        #Sprite Animation
-        if self.stepIndex >= 60: #This step index is a multiple of the amount of frames in the sprite to slow the sprite
-            self.stepIndex = 0
-        if self.going_right:
-            screen.blit(right[self.stepIndex//10], (self.x, self.y)) #stepIndex divided by this number must be equal to the amount of frames the animation has
-            self.stored_direction = True
-            self.stepIndex += 1
-        if self.going_left:
-            screen.blit(left[self.stepIndex//10], (self.x, self.y))
-            self.stored_direction = False
-            self.stepIndex += 1
-        if not self.going_left and not self.going_right:
-            if self.stepIndex >= 56:
-                self.stepIndex = 0
-            if self.stored_direction == True:
-                screen.blit(stationaryR[self.stepIndex//14], (self.x, self.y))
-            elif self.stored_direction == False:
-                screen.blit(stationaryL[self.stepIndex//14], (self.x, self.y))
-            self.stepIndex += 1
-
+    
     def hit_reg(self): #I have this set up such that attacking gives calculated data to victim, and being attacked takes data calculated from attacker
         # Hurt
         if self.hit:
@@ -494,30 +470,7 @@ class Enemy(): #Just copies player class but with bot stuff
             if bullet.bounce_count > 1: #Constant is how many times bullet can bounce
                 self.bullets.remove(bullet)
     
-    def reset(self, x, y):
-        # Walk
-        self.x = x
-        self.y = y
-        self.dx = 0
-        self.stored_direction = True #True = was facing right, False = was facing left
-        self.going_right = False
-        self.going_left = False
-        self.stepIndex = 0
-        # Jump
-        self.vel_y = 0
-        self.dy = 0
-        self.jumped = False
-        # Bullet
-        self.bullets = []
-        self.attack_timer = 0
-        # Health
-        self.hitbox = pygame.Rect(self.x, self.y, 64, 64)
-        self.hit = False #If hit true
-        self.hitpoints = 3 #Amount of health
-        self.hit_direction = 0 #Keeps track of side hit for knockback purpose, 0 = hit from left, 1 = hit from right
-        self.invincibility_timer = 0 #Sent to attacker to check if player can be hit
-
-
+    
 # Instances
 world = World(WORLD_DATA) 
 #Buttons
