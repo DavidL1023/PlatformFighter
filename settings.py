@@ -10,7 +10,7 @@ TILE_SIZE = 32 #Powers of 2 only
 SHOW_HITBOX = False
 SHOW_FPS = True
 
-FRAME_RATE = 30
+FRAME_RATE = 60
 
 WORLD_DATA = [ #Changes the map
 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
