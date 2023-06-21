@@ -2,4 +2,6 @@
 #, this makes it ignored
 
 *.toc linguist-vendored
+*.pyc linguist-vendored
+*.pkg linguist-vendored
 *.html linguist-vendored
