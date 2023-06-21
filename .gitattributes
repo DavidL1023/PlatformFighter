@@ -2,4 +2,4 @@
 #, this makes it ignored
 
 *.html linguist-vendored = false
-*.tex linguist-vendored = false
+*.pkg linguist-vendored = false
