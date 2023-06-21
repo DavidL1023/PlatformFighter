@@ -1,5 +1,5 @@
 #github incorectly thinking the project is in html and tex from build folder
 #, this makes it ignored
 
-*.tex linguist-vendored
+*.toc linguist-vendored
 *.html linguist-vendored
