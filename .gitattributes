@@ -1,3 +1,0 @@
-#github incorectly thinking the project is in html from build folder
-#, this makes it ignored
-build linguist-vendored
